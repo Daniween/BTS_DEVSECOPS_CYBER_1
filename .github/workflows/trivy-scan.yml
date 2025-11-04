@@ -3,9 +3,9 @@ name: Trivy Scan
 
 on:
   push:
-    branches: [main, fix/sercurity-Touitou-Yaacov]
+    branches: [main, fix/security-Touitou-Yaacov]
 
-    
+
 jobs:
   trivy-scan:
     runs-on: ubuntu-latest

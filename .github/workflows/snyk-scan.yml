@@ -3,10 +3,10 @@ name: Snyk Scan
 
 on:
   push:
-    branches: [main, fix/sercurity-Touitou-Yaacov]
+    branches: [main, fix/security-Touitou-Yaacov]
 
 
-    
+
 jobs:
   snyk-scan:
     runs-on: ubuntu-latest

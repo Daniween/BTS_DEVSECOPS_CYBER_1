@@ -3,9 +3,9 @@ name: Gitleaks Scan
 
 on:
   push:
-    branches: [main, fix/sercurity-Touitou-Yaacov]
+    branches: [main, fix/security-Touitou-Yaacov]
 
-    
+
 jobs:
   gitleaks-scan:
     runs-on: ubuntu-latest
