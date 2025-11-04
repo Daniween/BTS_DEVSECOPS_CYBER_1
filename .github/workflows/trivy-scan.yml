@@ -11,5 +11,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Scan with Trivy
+      - name: Scan dependencies with Trivy
         uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: false
+          vuln-type: "library"
+          severity: "CRITICAL,HIGH,MEDIUM"
