@@ -1,26 +1,19 @@
+run-name: Snyk Scan
 name: Snyk Scan
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, fix/sercurity-Touitou-Yaacov]
+
 
 jobs:
   snyk-scan:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout du code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Installer les dépendances
-        run: npm ci
-
-      - name: Lancer Snyk
-        uses: snyk/actions/node@master
+      - name: Scan libraries with Snyk
+        uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
