@@ -1,4 +1,4 @@
-name: Scan Trivy
+name: Trivy Scan
 
 on: [push, pull_request]
 
@@ -17,5 +17,5 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.41.3_Linux-64bit.deb
           sudo dpkg -i trivy_0.41.3_Linux-64bit.deb
 
-      - name: Scan de sécurité
+      - name: Scan du projet
         run: trivy fs . --severity HIGH,CRITICAL --exit-code 1 --format table

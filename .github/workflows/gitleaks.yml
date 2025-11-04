@@ -1,4 +1,4 @@
-name: Scan Gitleaks
+name: Gitleaks Scan
 
 on: [push, pull_request]
 
