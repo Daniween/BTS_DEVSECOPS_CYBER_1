@@ -3,10 +3,10 @@ name: Trivy Security Scan
 on:
   push:
     branches:
-      - fix/security-avital
+      - fix/security-eden
   pull_request:
     branches:
-      - fix/security-avital
+      - fix/security-eden
 
 jobs:
   trivy:
@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@master
