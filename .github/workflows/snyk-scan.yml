@@ -1,35 +1,31 @@
-name: Snyk Security Scan
-
+name: Snyk Scan
 on:
   push:
-    branches: [main, 'fix/security-*']
+    branches:
+      - fix/security-avital
   pull_request:
+    branches:
+      - fix/security-avital
 
-jobs:
-  snyk-scan:
+jobs: 
+  snyk:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18' 
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Authenticate Snyk
-        uses: snyk/actions/setup@master
+      - name: Run Snyk test
+        uses: snyk/actions/node@master
         with:
-          token: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Run Snyk Test
-        run: snyk test --all-projects --json > ./evidence/snyk_report.json || true
-
-      - name: Upload Snyk report
-        uses: actions/upload-artifact@v3
-        with:
-          name: snyk-report
-          path: ./evidence/snyk_report.json
+          command: test
+        env:
+          SNYK_TOKEN: ${{ secrets.snyk }}
