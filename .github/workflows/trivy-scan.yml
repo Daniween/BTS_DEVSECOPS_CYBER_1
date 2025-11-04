@@ -1,20 +1,21 @@
-name: Scan de sécurité Trivy
+name: Scan Trivy
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   trivy-scan:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Récupération du code
+      - name: Checkout du code
         uses: actions/checkout@v3
 
-      - name: Exécution du scan de vulnérabilités Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+      - name: Installer Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.41.3_Linux-64bit.deb
+          sudo dpkg -i trivy_0.41.3_Linux-64bit.deb
+
+      - name: Scan de sécurité
+        run: trivy fs . --severity HIGH,CRITICAL --exit-code 1 --format table

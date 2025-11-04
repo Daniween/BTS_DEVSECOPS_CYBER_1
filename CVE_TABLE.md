@@ -1,53 +1,62 @@
-| Vulnérabilité | Référence | Correctif appliqué | Gravité | OWASP Top-10 (2021) | Preuve |
-|---------------|-----------|-------------------|---------|--------------------|--------|
-| Command Injection / ReDoS | GHSA-35jh-r3h4-6jhm / GHSA-29mw-wpgm-hmr9 | npm install lodash@4.17.21 | High | A03:2021 - Injection | CI Trivy report |
-| Prototype Pollution / Signature Verification / Open Redirect | GHSA-5rrq-pxf6-6jx5 et autres | npm install node-forge@1.3.1 | High | A05:2021 - Security Misconfiguration | CI Snyk report |
-| XSS / RCE | GHSA-h9rv-jmmf-4pgx / GHSA-hxcc-f52p-wc94 | npm install serialize-javascript@2.1.2 | High | A03:2021 - Injection | CI Trivy report |
+# CVE_TABLE.md
 
+> Ce fichier récapitule toutes les vulnérabilités identifiées et corrigées pour le TP DevSecOps.
+> Les preuves sont dans le dossier `preuve`.
 
+---
 
-# Tableau des Vulnérabilités (CVE_TABLE.md)
+## Vulnérabilités des dépendances
 
-## Vulnérabilités des Dépendances
+| Vulnérabilité | Référence (CVE / Advisory) | Correctif appliqué (commande exacte) | Gravité | OWASP Top-10 (2021) | Preuve (fichiers dans `preuve/`) |
+|---|---:|---|---|---|---|
+| Injection de commande / ReDoS dans **lodash** | GHSA-35jh-r3h4-6jhm / GHSA-29mw-wpgm-hmr9 | `npm install lodash@4.17.21` | ÉLEVÉE | A03:2021 - Injection / A04:2021 - Conception non sécurisée | `preuve/npm_audit_pre.json` → `preuve/npm_audit_post.json` ; `preuve/snyk_post.json` |
+| XSS / RCE via **serialize-javascript** | GHSA-h9rv-jmmf-4pgx / GHSA-hxcc-f52p-wc94 | `npm install serialize-javascript@3.1.0` | ÉLEVÉE | A03:2021 - Injection | `preuve/npm_audit_pre.json` → `preuve/npm_audit_post.json` ; `preuve/trivy_post.json` |
+| Prototype pollution & failles crypto dans **node-forge** | GHSA-5rrq-pxf6-6jx5, GHSA-2r2c-g63r-vccr, GHSA-x4jg-mjrx-434g, GHSA-cfm4-qjh2-4765 | `npm install node-forge@1.3.1` | ÉLEVÉE | A02:2021 - Échecs cryptographiques / A08:2021 - Échecs d'intégrité logicielle | `preuve/snyk_post.json` ; `preuve/npm_audit_post.json` |
 
-| Vulnérabilité | Référence | Correctif appliqué | Gravité | OWASP Top-10 (2021) |
-|---------------|-----------|-------------------|---------|---------------------|
-| Injection de commande dans lodash | GHSA-35jh-r3h4-6jhm | `npm install lodash@^4.17.21` | ÉLEVÉE | A03:2021 - Injection |
-| Déni de service par expression régulière (ReDoS) dans lodash | GHSA-29mw-wpgm-hmr9 | `npm install lodash@^4.17.21` | MODÉRÉE | A04:2021 - Conception non sécurisée |
-| Cross-Site Scripting (XSS) dans serialize-javascript | GHSA-h9rv-jmmf-4pgx | `npm install serialize-javascript@^3.1.0` | MODÉRÉE | A03:2021 - Injection |
-| Exécution de code à distance (RCE) dans serialize-javascript | GHSA-hxcc-f52p-wc94 | `npm install serialize-javascript@^3.1.0` | ÉLEVÉE | A03:2021 - Injection |
-| Pollution de prototype dans node-forge | GHSA-5rrq-pxf6-6jx5 | `npm install node-forge@^1.3.1` | FAIBLE | A08:2021 - Échecs d'intégrité logicielle et des données |
-| Problèmes cryptographiques dans node-forge | GHSA-2r2c-g63r-vccr, GHSA-x4jg-mjrx-434g, GHSA-cfm4-qjh2-4765 | `npm install node-forge@^1.3.1` | ÉLEVÉE | A02:2021 - Échecs cryptographiques |
+---
 
-## Vulnérabilités de Code
+## Vulnérabilités de code (correction manuelle)
 
-| Vulnérabilité | Référence | Correctif appliqué | Gravité | OWASP Top-10 (2021) |
-|---------------|-----------|-------------------|---------|---------------------|
-| Exécution de code à distance via lodash.template | routes/user.js | Remplacement par remplacement de chaîne sécurisé | CRITIQUE | A03:2021 - Injection |
-| Sérialisation non sécurisée | utils/serializer.js | Suppression de l'option unsafe: true | ÉLEVÉE | A03:2021 - Injection |
+| Vulnérabilité | Fichier / Emplacement | Correctif appliqué (description & extrait) | Gravité | OWASP Top-10 (2021) | Preuve |
+|---|---:|---|---|---|---|
+| Exécution de code via `lodash.template()` | `routes/user.js` | Remplacement de `_.template()` par un remplacement de chaîne sécurisé (ex : `const out = safeTemplateReplace(templateString, data)`) | CRITIQUE | A03:2021 - Injection | `preuve/git_show_replace_lodash_template.txt` ; `preuve/npm_start_post.txt` |
+| Sérialisation non sécurisée (option `unsafe: true`) | `utils/serializer.js` | Suppression de l'option `unsafe: true` et utilisation d'une fonction de sérialisation sûre (ex : `JSON.stringify`) | ÉLEVÉE | A03:2021 - Injection | `preuve/git_show_serializer_fix.txt` ; `preuve/npm_audit_post.json` |
 
-## Secrets
+---
 
-| Vulnérabilité | Référence | Correctif appliqué | Gravité | OWASP Top-10 (2021) |
-|---------------|-----------|-------------------|---------|---------------------|
-| Secret commité (clé SSH) | private-node.pem.pub | `git rm --cached private-node.pem.pub` + .gitignore | ÉLEVÉE | A01:2021 - Contrôle d'accès défaillant |
+## Secrets / Fuites de données
 
-## Résumé des Correctifs
+| Vulnérabilité | Fichier | Correctif appliqué (commande exacte) | Gravité | OWASP Top-10 (2021) | Preuve |
+|---|---:|---|---|---|---|
+| Secret commité (.env) | `.env` | `git rm --cached .env` + ajout `.env` dans `.gitignore` ; commit dédié | ÉLEVÉE | A01:2021 - Contrôle d'accès défaillant | `preuve/remove_secrets_commit.txt` ; `preuve/gitleaks_pre.json` → `preuve/gitleaks_post.json` |
+| Clé publique/privée commise | `private-node.pem` / `private-node.pem.pub` | `git rm --cached private-node.pem private-node.pem.pub` + `.gitignore` + note dans README sur rotation de clés | ÉLEVÉE | A01:2021 - Contrôle d'accès défaillant | `preuve/remove_secrets_commit.txt` ; `preuve/gitleaks_post.json` |
 
-### 1. Mise à jour des dépendances
+---
+
+## Résumé des correctifs appliqués
+
 ```bash
-npm install lodash@^4.17.21 serialize-javascript@^3.1.0 node-forge@^1.3.1
-```
+# 1) ajouts fichiers privé dans le.gitignore
+- private-node.pem.pub 
+- .env
+- private-node.pem
 
-### 2. Correction du code
-- **routes/user.js** : Remplacement de `lodash.template()` par remplacement de chaîne sécurisé
-- **utils/serializer.js** : Suppression de l'option `unsafe: true`
+# 2) Scan 
 
-### 3. Gestion des secrets
-- **.gitignore** : Ajout des patterns pour exclure les fichiers de secrets
-- **Suppression Git** : `git rm --cached private-node.pem.pub` (commit séparé)
+npm audit 
+npm audit fix 
 
-## Validation
+# 3) Mise à jour des dépendances vulnérables
+npm install lodash@4.17.21
+npm install node-forge@1.3.1
+npm install serialize-javascript@3.1.0
 
-- `npm audit` : ✅ 0 vulnérabilités détectées
-- Workflows GitHub Actions configurés pour valider les corrections
+
+# 4) Vérifications et logs génération des preuves
+npm audit --json > preuve/npm_audit_post.json
+
+snyk test --json > preuve/snyk_post.json || true
+
+trivy fs --format json -o preuve/trivy_post.json . || true
+
+gitleaks detect --report-format json --report-path preuve/gitleaks_post.json || true
